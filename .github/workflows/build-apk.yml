@@ -30,7 +30,19 @@ jobs:
         run: flutter create --platforms=android --org com.foreverspecial --project-name birthday .
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get      - 
+        name: Set minimum Android SDK
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ["android/app/build.gradle", "android/app/build.gradle.kts"]:
+              p = Path(name)
+              if p.exists():
+                  s = p.read_text()
+                  s = s.replace("minSdkVersion flutter.minSdkVersion", "minSdkVersion 23")
+                  s = s.replace("minSdk = flutter.minSdkVersion", "minSdk = 23")
+                  p.write_text(s)
+          PY
 
       - name: Build APK
         run: flutter build apk --debug
