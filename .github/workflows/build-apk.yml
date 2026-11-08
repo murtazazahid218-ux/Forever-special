@@ -1,5 +1,5 @@
 
-name: Build Forever Special APK
+name: Forever Special APK
 
 on:
   workflow_dispatch:
@@ -9,13 +9,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: Build APK
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract project ZIP
+      - name: Extract Flutter project
         run: |
           mkdir extracted
           unzip forever-special-first-build.zip -d extracted
@@ -27,13 +28,13 @@ jobs:
           flutter-version: '3.24.5'
           channel: stable
 
-      - name: Generate Android project
-        run: flutter create --platforms=android --org com.foreverspecial --project-name birthday .
+      - name: Create Android platform
+        run: flutter create --platforms=android --org com.foreverspecial --project-name forever_special .
 
-      - name: Install dependencies
+      - name: Install packages
         run: flutter pub get
 
-      - name: Set minimum Android SDK
+      - name: Set Android minimum SDK
         run: |
           python3 - <<'PY'
           from pathlib import Path
