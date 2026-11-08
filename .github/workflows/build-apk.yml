@@ -1,3 +1,4 @@
+
 name: Build Forever Special APK
 
 on:
@@ -30,8 +31,9 @@ jobs:
         run: flutter create --platforms=android --org com.foreverspecial --project-name birthday .
 
       - name: Install dependencies
-        run: flutter pub get      - 
-        name: Set minimum Android SDK
+        run: flutter pub get
+
+      - name: Set minimum Android SDK
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -52,3 +54,4 @@ jobs:
         with:
           name: Forever-Special-APK
           path: build/app/outputs/flutter-apk/app-debug.apk
+          
