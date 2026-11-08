@@ -9,14 +9,13 @@ on:
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract Flutter project
+      - name: Extract project ZIP
         run: |
           mkdir extracted
           unzip forever-special-first-build.zip -d extracted
@@ -28,30 +27,29 @@ jobs:
           flutter-version: '3.24.5'
           channel: stable
 
-      - name: Create Android platform
+      - name: Create Android project
         run: flutter create --platforms=android --org com.foreverspecial --project-name forever_special .
 
-      - name: Install packages
-        run: flutter pub get
-
-      - name: Set Android minimum SDK
+      - name: Set minimum SDK to 23
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
 
-          for name in ["android/app/build.gradle", "android/app/build.gradle.kts"]:
-              p = Path(name)
-              if p.exists():
-                  s = p.read_text()
-                  s = re.sub(
-                      r'minSdk(?:Version)?\s*[= ]+\s*(?:flutter\.minSdkVersion|\d+)',
-                      'minSdk = 23' if name.endswith('.kts') else 'minSdkVersion 23',
-                      s
-                  )
-                  p.write_text(s)
-                  print("Updated:", name)
+          p = Path("android/app/build.gradle")
+          s = p.read_text()
+          s = re.sub(r'minSdkVersion\s+.*', 'minSdkVersion 23', s)
+          s = re.sub(r'minSdk\s*=\s*.*', 'minSdk = 23', s)
+          p.write_text(s)
+          print("Updated Android minimum SDK to 23")
+          print([line.strip() for line in s.splitlines() if "minSdk" in line])
           PY
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Verify minimum SDK
+        run: grep -n "minSdk" android/app/build.gradle
 
       - name: Build APK
         run: flutter build apk --debug
